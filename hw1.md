@@ -1,8 +1,8 @@
-#Homework 1
+# Homework 1
 
-##Contributors: Avery J. Schiff
+## Contributors: Avery J. Schiff
 
-###CSCI 5828
+### CSCI 5828
 
 1. When Brooks references essential difficulties, he is describing problems that will always be present in software engineering because they arise from fundamental properties of software. 
 These problems are not caused by inexperience or mistakes but by the complex nature of software engineering.
