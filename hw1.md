@@ -62,7 +62,7 @@ The key caveat is that not all discoveries by chemists or computer scientists ar
 Just as a chemist's new rapid reaction might require a prohibitively expensive substance for industrial use, a computer scientist might invent a new algorithm that while elegant and powerful requires far more computational power than is available to most software companies.
 
 
-6.
+6. Five of the key principles employed by software engineers are abstraction, conversation, specification, translation, and iteration.
 
     * Abstractions are ways of redefining problems in more understandable ways.
 This might happen through higher level programming languages with more intuitive syntax, GUIs for managing file systems, or a variety of other tools used to simplify interactions with the software.
