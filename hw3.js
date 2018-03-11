@@ -1,4 +1,5 @@
 var fs = require('fs');
+var start = process.argv[2];
 
 var fail = function(err) { console.log(err)};
 
@@ -10,7 +11,9 @@ var get_files = function(dir){
   return new Promise(function(resolve, reject) {
     fs.readdir(dir, function(err, files) {
       if (err) { return reject(err)};
-      resolve(files);
+      fullpaths = [];
+      files.forEach(file=>fullpaths.push(dir + '/' + file));
+      resolve(fullpaths);
     });
   });
 }
@@ -43,7 +46,8 @@ var gather = function(files){
       promises.push(get_size(name));
     }
     if (isDirectory){
-      promises.push(Promise.resolve(0));
+      //promises.push(Promise.resolve(0));
+      promises.push(readDir(name));
     }
   });
   return Promise.all(promises);
@@ -56,7 +60,11 @@ var detect = function(files) {
 }
 
 var sum = function(sizes) {
-  return sizes.reduce((a,b) => a+b);
+  if (sizes.length > 0){
+    return sizes.reduce((a,b) => a+b);
+  }else{
+    return 0;
+  }
 }
 
 var readDir = function(dir){
@@ -72,4 +80,4 @@ var report = function(dir){
   size.then(total=>console.log("Total size: ", total));
 }
 
-report('.');
+report(start);
