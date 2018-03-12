@@ -1,23 +1,29 @@
 var fs = require('fs');
-var start = process.argv[2];
+var topdir = process.argv[2];
 
 var fail = function(err) { console.log(err)};
 
-var report = function(size) {
-  console.log("Total size: ", size);
-}
+var print = function(total) {console.log("Total size:", total, "bytes")}; //final print statement
 
+/***
+ * Scans a directory for all files and
+ * directories. Appends the full path to the
+ * names and returns them in an array
+ ***/
 var get_files = function(dir){
   return new Promise(function(resolve, reject) {
     fs.readdir(dir, function(err, files) {
       if (err) { return reject(err)};
       fullpaths = [];
-      files.forEach(file=>fullpaths.push(dir + '/' + file));
+      files.forEach(file=>fullpaths.push(dir + '/' + file)); //adds full path to file name
       resolve(fullpaths);
     });
   });
 }
 
+/***
+ * Returns the size of a file in bytes
+ ***/
 var get_size = name => {
   return new Promise(function(resolve, reject) {
     fs.stat(name, function(err, stats) {
@@ -27,6 +33,12 @@ var get_size = name => {
   });
 }
 
+/***
+ * Returns an array containing 
+ * 0 - The name of something in a directory (string)
+ * 1 - Whether it is a file or not (Boolean)
+ * 2 - Whether it is a directory or not (Boolean)
+ ***/
 var find_type = function(name) {
   return new Promise(function(resolve, reject) {
     fs.stat(name, function(err, stats) {
@@ -36,6 +48,12 @@ var find_type = function(name) {
   });
 }
 
+/***
+ * Takes an array of arrays created by find_type
+ * For each array, it finds the size if the
+ * object is a file and begins a directory
+ * traversal if it's a directory
+ * **/
 var gather = function(files){
   var promises = [];
   files.forEach( info => {
@@ -46,19 +64,27 @@ var gather = function(files){
       promises.push(get_size(name));
     }
     if (isDirectory){
-      //promises.push(Promise.resolve(0));
       promises.push(readDir(name));
     }
   });
   return Promise.all(promises);
 }
 
+/***
+ * Creates an array of promises containing
+ * arrays defined by find_type
+ * **/
 var detect = function(files) {
   var promises = [];
   files.forEach(file => promises.push(find_type(file)));
   return Promise.all(promises);
 }
 
+/***
+ * Reduces an array of sizes by summing them together
+ * If given an empty array (caused by traversing an empty directory)
+ * then it will return 0
+ * **/
 var sum = function(sizes) {
   if (sizes.length > 0){
     return sizes.reduce((a,b) => a+b);
@@ -67,17 +93,30 @@ var sum = function(sizes) {
   }
 }
 
+/***
+ * Traverses a directory and returns the size
+ * in bytes of all files in the directory and
+ * its sub-directories
+ * **/
 var readDir = function(dir){
-  var files = get_files(dir);
   return new Promise(function(resolve, reject) {
-    var size = files.then(detect).then(gather).then(sum).catch(fail);
-    resolve(size);
+    var files = get_files(dir);
+    files.then(detect).then(gather).then(sum).then(resolve).catch(fail);
   });
 }
 
+/***
+ * Checks whether a parameter is provided for
+ * the initial directory.
+ * If so, traverses the directory and prints the
+ * the size if the directory exists
+ * **/
 var report = function(dir){
-  var size = readDir(dir);
-  size.then(total=>console.log("Total size: ", total));
+  if (!dir){
+    fail("Error: Directory must be provided as command line argument");
+  }else{
+    readDir(dir).then(print).catch(fail);
+  }
 }
 
-report(start);
+report(topdir);
