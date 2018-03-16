@@ -1,3 +1,8 @@
+/* CSCI 5828 - Spring 2018
+ * Homework 3
+ * Collaborators: Avery Schiff
+ */
+
 var fs = require('fs');
 var topdir = process.argv[2];
 
